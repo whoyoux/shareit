@@ -1,5 +1,5 @@
 import { auth } from "@/lib/auth";
-import { decryptFile, decryptUserKey } from "@/lib/crypto";
+import { decryptFile } from "@/lib/crypto";
 import { prisma } from "@/lib/prisma";
 import { getFileFromURL } from "@/lib/utils";
 
