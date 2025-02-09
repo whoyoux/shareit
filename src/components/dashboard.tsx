@@ -2,8 +2,6 @@ import { cachedAuth } from "@/lib/auth";
 import UploadFileForm from "./upload-file-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileList } from "./file-list";
-import { prisma } from "@/lib/prisma";
-import { unstable_cacheTag as cacheTag } from "next/cache";
 import { Suspense } from "react";
 
 // const getCachedFiles = unstable_cache(
