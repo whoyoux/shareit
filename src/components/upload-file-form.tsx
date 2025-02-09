@@ -18,7 +18,7 @@ export default function UploadFileForm() {
 				fd.append("file", file);
 
 				setIsUploading(true);
-				const resultObj = await fetch("/api/storage/encrypt", {
+				const resultObj = await fetch("/api/storage/save", {
 					body: fd,
 					method: "POST",
 				});

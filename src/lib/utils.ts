@@ -31,3 +31,29 @@ export function formatFileSize(bytes: number): string {
 	if (bytes >= 1024) return `${(bytes / 1024).toFixed(2)} KB`;
 	return `${bytes} B`;
 }
+
+const ENDPOINT = "https://27kg90fflc.ufs.sh/f/";
+export async function getFileFromURL(fileKey: string, fileName: string) {
+	try {
+		// Fetch the file from the endpoint
+		const response = await fetch(`${ENDPOINT}${fileKey}`);
+
+		if (!response.ok) {
+			throw new Error(`Failed to fetch file: ${response.statusText}`);
+		}
+
+		// Get the file data as an array buffer
+		const arrayBuffer = await response.arrayBuffer();
+		const file = new File([arrayBuffer], fileName);
+		return {
+			success: true,
+			file,
+		};
+	} catch (error) {
+		console.error("Error downloading file:", error);
+		return {
+			success: false,
+			message: `Error downloading file ${error}`,
+		};
+	}
+}

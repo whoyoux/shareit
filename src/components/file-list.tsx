@@ -21,39 +21,29 @@ import {
 import type { File } from "@prisma/client";
 import { formatFileSize } from "@/lib/utils";
 
-// type File = {
-// 	id: string;
-// 	name: string;
-// 	size: string;
-// 	type: string;
-// 	uploadedAt: string;
-// };
-
-// const mockFiles: File[] = [
-// 	{
-// 		id: "1",
-// 		name: "document.pdf",
-// 		size: "2.5 MB",
-// 		type: "PDF",
-// 		uploadedAt: "2023-06-01",
-// 	},
-// 	{
-// 		id: "2",
-// 		name: "image.jpg",
-// 		size: "1.8 MB",
-// 		type: "Image",
-// 		uploadedAt: "2023-06-02",
-// 	},
-// 	{
-// 		id: "3",
-// 		name: "spreadsheet.xlsx",
-// 		size: "500 KB",
-// 		type: "Spreadsheet",
-// 		uploadedAt: "2023-06-03",
-// 	},
-// ];
-
 export function FileList({ files }: { files: File[] }) {
+	const downloadFile = async (fileKey: string, fileName: string) => {
+		try {
+			const response = await fetch(`/api/storage/download?fileKey=${fileKey}`);
+			if (!response.ok) {
+				console.error("Failed to download file:", response.statusText);
+				return;
+			}
+
+			const blob = await response.blob();
+			const url = window.URL.createObjectURL(blob);
+			const a = document.createElement("a");
+			a.href = url;
+			a.download = fileName;
+			document.body.appendChild(a);
+			a.click();
+			window.URL.revokeObjectURL(url);
+			document.body.removeChild(a);
+		} catch (error) {
+			console.error("Error downloading file:", error);
+		}
+	};
+
 	return (
 		<Table>
 			<TableHeader>
@@ -69,7 +59,10 @@ export function FileList({ files }: { files: File[] }) {
 				{files.map((file) => (
 					<TableRow key={file.id}>
 						<TableCell className="font-medium">
-							<FileIcon className="inline-block mr-2" size={16} />
+							<FileIcon
+								className="inline-block mr-2 truncate max-w-[200px]"
+								size={16}
+							/>
 							{file.filename}
 						</TableCell>
 						<TableCell>{formatFileSize(file.size)}</TableCell>
@@ -85,7 +78,9 @@ export function FileList({ files }: { files: File[] }) {
 								</DropdownMenuTrigger>
 								<DropdownMenuContent align="end">
 									<DropdownMenuLabel>Actions</DropdownMenuLabel>
-									<DropdownMenuItem>
+									<DropdownMenuItem
+										onClick={() => downloadFile(file.key, file.filename)}
+									>
 										<Download className="mr-2 h-4 w-4" />
 										<span>Download</span>
 									</DropdownMenuItem>

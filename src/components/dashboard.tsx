@@ -17,7 +17,7 @@ export default async function Dashboard() {
 	});
 
 	return (
-		<div className="flex flex-col gap-8 w-full">
+		<div className="flex flex-col gap-4 w-full">
 			<div className="flex flex-col-reverse md:flex-row gap-4">
 				<Card>
 					<CardHeader className="flex flex-row items-center justify-between pb-2">
