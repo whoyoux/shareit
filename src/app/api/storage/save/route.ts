@@ -3,6 +3,7 @@ import { encryptFile } from "@/lib/crypto";
 import { prisma } from "@/lib/prisma";
 import { uploadServerSideFile } from "@/lib/uploadthing";
 import { formatZodError } from "@/lib/utils";
+import { revalidateTag } from "next/cache";
 import { z } from "zod";
 import { zfd } from "zod-form-data";
 
@@ -40,7 +41,6 @@ export const POST = async (request: Request) => {
 	const parsedBody = await bodySchema.safeParseAsync(fd);
 
 	if (parsedBody.error) {
-		console.error(parsedBody.error);
 		return new Response(
 			JSON.stringify({
 				success: false,
@@ -70,8 +70,6 @@ export const POST = async (request: Request) => {
 		where: { id: session.user.id },
 		select: { encryptedKey: true },
 	});
-
-	console.log(userEncryptedKey);
 
 	if (!userEncryptedKey?.encryptedKey) {
 		return new Response("User key not found!", {
@@ -111,6 +109,8 @@ export const POST = async (request: Request) => {
 			},
 		},
 	});
+
+	revalidateTag(`files-${session.user.id}`);
 
 	return new Response(JSON.stringify({ success: true }), { status: 200 });
 };

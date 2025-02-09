@@ -3,6 +3,29 @@ import UploadFileForm from "./upload-file-form";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileList } from "./file-list";
 import { prisma } from "@/lib/prisma";
+import { unstable_cacheTag as cacheTag } from "next/cache";
+import { Suspense } from "react";
+
+// const getCachedFiles = unstable_cache(
+// 	async (userId: string) => {
+// 		return prisma.file.findMany({
+// 			where: { userId },
+// 			orderBy: { createdAt: "desc" },
+// 		});
+// 	},
+// 	["files", "user-files"],
+// 	{ tags: ["files"] },
+// );
+
+// const getCachedFiles = async (userId: string) => {
+// 	"use cache";
+// 	cacheTag(`files-${userId}`);
+// 	const files = await prisma.file.findMany({
+// 		where: { userId },
+// 		orderBy: { createdAt: "desc" },
+// 	});
+// 	return files;
+// };
 
 export default async function Dashboard() {
 	const session = await cachedAuth();
@@ -11,10 +34,7 @@ export default async function Dashboard() {
 		return <div>Please log in</div>;
 	}
 
-	const files = await prisma.file.findMany({
-		where: { userId: session.user.id },
-		orderBy: { createdAt: "desc" },
-	});
+	// const files = await getCachedFiles(session.user.id);
 
 	return (
 		<div className="flex flex-col gap-4 w-full">
@@ -50,15 +70,17 @@ export default async function Dashboard() {
 			</div>
 
 			<div>
-				<Card>
-					<CardHeader>
-						<CardTitle>Your files</CardTitle>
-						{/* <CardDescription>Your uploaded files</CardDescription> */}
-					</CardHeader>
-					<CardContent>
-						<FileList files={files} />
-					</CardContent>
-				</Card>
+				<Suspense fallback={<div>Loading...</div>}>
+					<Card>
+						<CardHeader>
+							<CardTitle>Your files</CardTitle>
+							{/* <CardDescription>Your uploaded files</CardDescription> */}
+						</CardHeader>
+						<CardContent>
+							<FileList />
+						</CardContent>
+					</Card>
+				</Suspense>
 			</div>
 		</div>
 	);

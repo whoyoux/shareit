@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/sonner";
 
 import { cn } from "@/lib/utils";
 import Header from "@/components/header";
+import ReactQueryProvider from "@/components/react-query-provider";
 
 const fontSans = FontSans({
 	subsets: ["latin"],
@@ -26,11 +27,13 @@ export default function RootLayout({
 			<body
 				className={cn(" font-sans antialiased bg-gray-100", fontSans.variable)}
 			>
-				<div className="max-w-screen-lg mx-auto p-4">
-					<Header />
-					{children}
-				</div>
-				<Toaster />
+				<ReactQueryProvider>
+					<div className="max-w-screen-lg mx-auto p-4">
+						<Header />
+						{children}
+					</div>
+					<Toaster />
+				</ReactQueryProvider>
 			</body>
 		</html>
 	);

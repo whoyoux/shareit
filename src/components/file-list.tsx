@@ -20,8 +20,22 @@ import {
 } from "@/components/ui/dropdown-menu";
 import type { File } from "@prisma/client";
 import { formatFileSize } from "@/lib/utils";
+import { useQuery } from "@tanstack/react-query";
 
-export function FileList({ files }: { files: File[] }) {
+const fetchFiles = async (): Promise<File[]> => {
+	const response = await fetch("/api/storage/list");
+	if (!response.ok) {
+		throw new Error("Failed to fetch files");
+	}
+	return response.json();
+};
+
+export function FileList() {
+	const { data, error, isLoading } = useQuery({
+		queryKey: ["files"],
+		queryFn: fetchFiles,
+	});
+
 	const downloadFile = async (fileKey: string, fileName: string) => {
 		try {
 			const response = await fetch(`/api/storage/download?fileKey=${fileKey}`);
@@ -44,6 +58,33 @@ export function FileList({ files }: { files: File[] }) {
 		}
 	};
 
+	if (isLoading) {
+		return (
+			<Table>
+				<TableHeader>
+					<TableRow>
+						<TableHead>Name</TableHead>
+						<TableHead>Size</TableHead>
+						<TableHead>Type</TableHead>
+						<TableHead>Uploaded At</TableHead>
+						<TableHead>Actions</TableHead>
+					</TableRow>
+				</TableHeader>
+				<TableBody>
+					<TableRow>
+						<TableCell colSpan={5} className="text-center">
+							Loading...
+						</TableCell>
+					</TableRow>
+				</TableBody>
+			</Table>
+		);
+	}
+
+	if (error) {
+		return <span>Error: {error.message}</span>;
+	}
+
 	return (
 		<Table>
 			<TableHeader>
@@ -56,7 +97,7 @@ export function FileList({ files }: { files: File[] }) {
 				</TableRow>
 			</TableHeader>
 			<TableBody>
-				{files.map((file) => (
+				{data?.map((file) => (
 					<TableRow key={file.id}>
 						<TableCell className="font-medium">
 							<FileIcon
@@ -67,7 +108,9 @@ export function FileList({ files }: { files: File[] }) {
 						</TableCell>
 						<TableCell>{formatFileSize(file.size)}</TableCell>
 						<TableCell>{file.mimetype}</TableCell>
-						<TableCell>{file.createdAt.toDateString()}</TableCell>
+						<TableCell>
+							{new Date(file.createdAt).toLocaleDateString()}
+						</TableCell>
 						<TableCell>
 							<DropdownMenu>
 								<DropdownMenuTrigger asChild>
