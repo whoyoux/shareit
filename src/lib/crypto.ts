@@ -1,7 +1,6 @@
 import "server-only";
 
 import crypto from "node:crypto";
-import { prisma } from "./prisma";
 
 const STORAGE_MASTER_KEY = process.env.STORAGE_MASTER_KEY || "";
 if (!STORAGE_MASTER_KEY) {

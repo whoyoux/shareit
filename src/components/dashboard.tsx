@@ -1,12 +1,6 @@
 import { cachedAuth } from "@/lib/auth";
 import UploadFileForm from "./upload-file-form";
-import {
-	Card,
-	CardContent,
-	CardDescription,
-	CardHeader,
-	CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { FileList } from "./file-list";
 import { prisma } from "@/lib/prisma";
 
